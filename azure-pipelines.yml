@@ -8,16 +8,6 @@ jobs:
 
   strategy:
     matrix:
-      vc140-x86-release:
-        ARCHITECTURE_SUFFIX: ''
-        BUILD_TOOLSET_VERSION: '140'
-        BUILD_CONFIGURATION: 'release'
-        CMAKE_GENERATOR: 'Visual Studio 15 2017'
-      vc140-x64-release:
-        ARCHITECTURE_SUFFIX: '-x64'
-        BUILD_TOOLSET_VERSION: '140'
-        BUILD_CONFIGURATION: 'release'
-        CMAKE_GENERATOR: 'Visual Studio 15 2017 Win64'
       vc141-x86-release:
         ARCHITECTURE_SUFFIX: ''
         BUILD_TOOLSET_VERSION: '141'
