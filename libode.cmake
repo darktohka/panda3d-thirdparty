@@ -110,7 +110,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MT")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MTd")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MTd")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MT")
 
 configure_file(include/ode/precision.h.in ${CMAKE_CURRENT_SOURCE_DIR}/include/ode/precision.h)
 configure_file(libccd/src/ccd/precision.h.in ${CMAKE_CURRENT_SOURCE_DIR}/libccd/src/ccd/precision.h)
