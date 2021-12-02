@@ -19,7 +19,7 @@ jobs:
         BUILD_TOOLSET_VERSION: '143'
         BUILD_CONFIGURATION: 'release'
         CMAKE_GENERATOR: 'Visual Studio 17 2022'
-        CMAKE_ARCHITECTURE: 'Win64'
+        CMAKE_ARCHITECTURE: 'x64'
 
   steps:
   # configure & generate
