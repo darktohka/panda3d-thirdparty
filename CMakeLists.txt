@@ -469,7 +469,7 @@ if(BUILD_TIFF)
   ExternalProject_Add(
     tiff
     DEPENDS zlib jpeg
-    URL http://download.osgeo.org/libtiff/tiff-4.3.0.tar.gz=
+    URL http://download.osgeo.org/libtiff/tiff-4.3.0.tar.gz
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DCMAKE_PREFIX_PATH=${THIRDPARTY_DIR}/zlib;${THIRDPARTY_DIR}/jpeg
