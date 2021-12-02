@@ -24,11 +24,13 @@ jobs:
   steps:
   - task: PowerShell@2
     inputs:
-      script: Invoke-WebRequest -Uri https://strawberryperl.com/download/5.32.1.1/strawberry-perl-5.32.1.1-64bit.msi -OutFile perl.msi
+      targetType: 'inline'
+      script: 'Invoke-WebRequest -Uri https://strawberryperl.com/download/5.32.1.1/strawberry-perl-5.32.1.1-64bit.msi -OutFile perl.msi'
 
   - task: PowerShell@2
     inputs:
-      script: msiexec /i perl.msi /quiet /qn /norestart
+      targetType: 'inline'
+      script: 'msiexec /i perl.msi /quiet /qn /norestart'
 
   # configure & generate
   - task: CMake@1
