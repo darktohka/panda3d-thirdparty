@@ -22,15 +22,10 @@ jobs:
         CMAKE_ARCHITECTURE: 'x64'
 
   steps:
-  - task: PowerShell@2
+  - task: ChocolateyCommand@0
     inputs:
-      targetType: 'inline'
-      script: 'Invoke-WebRequest -Uri https://strawberryperl.com/download/5.32.1.1/strawberry-perl-5.32.1.1-64bit.msi -OutFile perl.msi'
-
-  - task: PowerShell@2
-    inputs:
-      targetType: 'inline'
-      script: 'msiexec /i perl.msi /quiet /qn /norestart'
+      command: 'install'
+      installPackageId: 'strawberryperl'
 
   # configure & generate
   - task: CMake@1
