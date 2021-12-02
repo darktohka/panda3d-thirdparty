@@ -4,30 +4,20 @@ variables:
 jobs:
 - job: Windows
   pool:
-    vmImage: 'VS2017-Win2016'
+    vmImage: 'windows-2022'
 
   strategy:
     matrix:
-      vc140-x86-release:
+      vc143-x86-release:
         ARCHITECTURE_SUFFIX: ''
-        BUILD_TOOLSET_VERSION: '140'
+        BUILD_TOOLSET_VERSION: '143'
         BUILD_CONFIGURATION: 'release'
-        CMAKE_GENERATOR: 'Visual Studio 15 2017'
-      vc140-x64-release:
+        CMAKE_GENERATOR: 'Visual Studio 17 2022'
+      vc143-x64-release:
         ARCHITECTURE_SUFFIX: '-x64'
-        BUILD_TOOLSET_VERSION: '140'
+        BUILD_TOOLSET_VERSION: '143'
         BUILD_CONFIGURATION: 'release'
-        CMAKE_GENERATOR: 'Visual Studio 15 2017 Win64'
-      vc141-x86-release:
-        ARCHITECTURE_SUFFIX: ''
-        BUILD_TOOLSET_VERSION: '141'
-        BUILD_CONFIGURATION: 'release'
-        CMAKE_GENERATOR: 'Visual Studio 15 2017'
-      vc141-x64-release:
-        ARCHITECTURE_SUFFIX: '-x64'
-        BUILD_TOOLSET_VERSION: '141'
-        BUILD_CONFIGURATION: 'release'
-        CMAKE_GENERATOR: 'Visual Studio 15 2017 Win64'
+        CMAKE_GENERATOR: 'Visual Studio 17 2022 Win64'
 
   steps:
   # configure & generate
@@ -46,8 +36,8 @@ jobs:
   # install
   - task: CopyFiles@2
     inputs:
-      sourceFolder: '$(Build.SourcesDirectory)/win-libs-vc15$(ARCHITECTURE_SUFFIX)'
-      targetFolder: '$(Build.BinariesDirectory)/thirdparty/win-libs-vc14$(ARCHITECTURE_SUFFIX)'
+      sourceFolder: '$(Build.SourcesDirectory)/win-libs-vc17$(ARCHITECTURE_SUFFIX)'
+      targetFolder: '$(Build.BinariesDirectory)/thirdparty/win-libs-vc17$(ARCHITECTURE_SUFFIX)'
 
   # packaging
   - task: ArchiveFiles@2

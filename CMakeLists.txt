@@ -56,7 +56,7 @@ if(CMAKE_GENERATOR MATCHES "^Visual Studio [0-9]+ ")
   if(MSVC_TOOLSET_VERSION)
     math(EXPR VCVER "${MSVC_TOOLSET_VERSION} / 10" OUTPUT_FORMAT DECIMAL)
   elseif(NOT (MSVC_VERSION LESS 1900))
-    set(VCVER 14)
+    set(VCVER 17)
   else()
     string(REPLACE " " ";" WORDS ${CMAKE_GENERATOR})
     list(GET WORDS 2 VCVER)
@@ -130,7 +130,7 @@ if(BUILD_ZLIB)
   ExternalProject_Add(
     zlib
     GIT_REPOSITORY https://github.com/madler/zlib.git
-    GIT_TAG cacf7f1d4e3d44d871b605da3b647f07d718623f #v1.2.11
+    GIT_TAG master
     #URL https://github.com/madler/zlib/archive/v1.2.11.tar.gz
     #URL_HASH SHA256=629380c90a77b964d896ed37163f5c3a34f6e6d897311f1df2a7016355c45eff
 
@@ -171,7 +171,7 @@ if(BUILD_PNG)
 
     # Please note that libpng 1.6.32+ requires CMake 3.0.2
     GIT_REPOSITORY https://github.com/glennrp/libpng.git
-    GIT_TAG 9fcb846402d8692d25cb5286777a832ca852fa44 #v1.6.31
+    GIT_TAG libpng16
     #URL https://github.com/glennrp/libpng/archive/v1.6.31.tar.gz
     #URL_HASH SHA256=79c0391804c83a6e0b722c20be7c3a27aeb2fe09afbc3028abad243444c98aa0
 
@@ -218,7 +218,7 @@ if(BUILD_BULLET)
   ExternalProject_Add(
     bullet
     GIT_REPOSITORY https://github.com/bulletphysics/bullet3.git
-    GIT_TAG 2fb92bc40c16e4da5a9018479d4a8e1899702ab8 #v2.83.7
+    GIT_TAG 830f0a9565b1829a07e21e2f16be2aa9966bd28c #v2.89
     #URL https://github.com/bulletphysics/bullet3/archive/2.83.7.tar.gz
     #URL_HASH SHA256=919087c764d0e93555c6ef0830c8951a9caafea99f52ac8b366e96adbe0112ed
 
@@ -249,8 +249,7 @@ if(BUILD_HARFBUZZ)
   ExternalProject_Add(
     freetype-nohb
     DEPENDS zlib
-    URL http://www.panda3d.org/download/noversion/freetype-2.7.1.tar.gz
-    URL_HASH SHA256=162ef25aa64480b1189cdb261228e6c5c44f212aac4b4621e28cf2157efb59f5
+    URL https://gitlab.freedesktop.org/freetype/freetype/-/archive/VER-2-11-0/freetype-VER-2-11-0.tar.gz
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DCMAKE_PREFIX_PATH=${THIRDPARTY_DIR}/zlib
@@ -264,8 +263,7 @@ if(BUILD_HARFBUZZ)
   ExternalProject_Add(
     harfbuzz
     DEPENDS freetype-nohb
-    URL https://www.freedesktop.org/software/harfbuzz/release/harfbuzz-2.6.4.tar.xz
-    URL_HASH SHA256=9413b8d96132d699687ef914ebb8c50440efc87b3f775d25856d7ec347c03c12
+    URL https://github.com/harfbuzz/harfbuzz/releases/download/3.1.2/harfbuzz-3.1.2.tar.xz
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/freetype-nohb
@@ -293,8 +291,7 @@ if(BUILD_FREETYPE)
   ExternalProject_Add(
     freetype
     DEPENDS zlib harfbuzz
-    URL http://www.panda3d.org/download/noversion/freetype-2.7.1.tar.gz
-    URL_HASH SHA256=162ef25aa64480b1189cdb261228e6c5c44f212aac4b4621e28cf2157efb59f5
+    URL https://gitlab.freedesktop.org/freetype/freetype/-/archive/VER-2-11-0/freetype-VER-2-11-0.tar.gz
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DCMAKE_PREFIX_PATH=${THIRDPARTY_DIR}/zlib;${THIRDPARTY_DIR}/harfbuzz
@@ -312,7 +309,7 @@ if(BUILD_VORBIS)
   ExternalProject_Add(
     ogg
     GIT_REPOSITORY https://github.com/xiph/ogg.git
-    GIT_TAG dd85929dbe38be4b3876c9c0d6d5dcb7a128f388
+    GIT_TAG master
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
     INSTALL_DIR ${THIRDPARTY_DIR}/vorbis
@@ -322,7 +319,7 @@ if(BUILD_VORBIS)
     vorbis
     DEPENDS ogg
     GIT_REPOSITORY https://github.com/xiph/vorbis.git
-    GIT_TAG 8ef0f8058854b2ef55d2d42bbe84487a9aadae12
+    GIT_TAG master
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DOGG_ROOT=${THIRDPARTY_DIR}/vorbis
@@ -339,7 +336,7 @@ if(BUILD_OPUS)
   ExternalProject_Add(
     ogg-opus
     GIT_REPOSITORY https://github.com/xiph/ogg.git
-    GIT_TAG dd85929dbe38be4b3876c9c0d6d5dcb7a128f388
+    GIT_TAG master
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
     INSTALL_DIR ${THIRDPARTY_DIR}/opus
@@ -348,7 +345,7 @@ if(BUILD_OPUS)
   ExternalProject_Add(
     opus
     GIT_REPOSITORY https://github.com/xnorpx/opus.git
-    GIT_TAG e58822ef814b9bd9baeabecd7024aa7a6d4b5adf # PR#100
+    GIT_TAG master
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
     INSTALL_DIR ${THIRDPARTY_DIR}/opus
@@ -358,7 +355,7 @@ if(BUILD_OPUS)
     opusfile
     DEPENDS ogg-opus opus
     GIT_REPOSITORY https://github.com/xiph/opusfile.git
-    GIT_TAG b7c2ed3bafd9b08cd5d276894ca18fb58bcbfbc9 #0.11
+    GIT_TAG master
 
     PATCH_COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_LIST_DIR}/libopusfile.cmake <SOURCE_DIR>/CMakeLists.txt
 
@@ -378,7 +375,7 @@ if(BUILD_OPENAL)
   ExternalProject_Add(
     openal
     GIT_REPOSITORY https://github.com/kcat/openal-soft.git
-    GIT_TAG 6761218e51699f46bf25c377e65b3e9ea5e434b9 # 1.19.1
+    GIT_TAG master
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DLIBTYPE=STATIC
@@ -403,8 +400,7 @@ endif()
 if(BUILD_JPEG)
   ExternalProject_Add(
     jpeg
-    URL http://www.ijg.org/files/jpegsrc.v9b.tar.gz
-    URL_HASH SHA256=58ecf07d183dd4684d6d943d4b8cd4558cf024421036fa16b39334f9ebb393da
+    URL http://www.ijg.org/files/jpegsrc.v9d.tar.gz
 
     PATCH_COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_LIST_DIR}/libjpeg.cmake <SOURCE_DIR>/CMakeLists.txt
           COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_LIST_DIR}/libjpeg-jconfig.h.cmake <SOURCE_DIR>/jconfig.h.cmake
@@ -479,8 +475,7 @@ if(BUILD_TIFF)
   ExternalProject_Add(
     tiff
     DEPENDS zlib jpeg
-    URL http://download.osgeo.org/libtiff/tiff-4.0.6.tar.gz
-    URL_HASH SHA256=4d57a50907b510e3049a4bba0d7888930fdfc16ce49f1bf693e5b6247370d68c
+    URL http://download.osgeo.org/libtiff/tiff-4.3.0.tar.gz=
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DCMAKE_PREFIX_PATH=${THIRDPARTY_DIR}/zlib;${THIRDPARTY_DIR}/jpeg
@@ -501,8 +496,7 @@ endif()
 if(BUILD_EIGEN)
   ExternalProject_Add(
     eigen
-    URL https://gitlab.com/libeigen/eigen/-/archive/3.2.8/eigen-3.2.8.tar.gz
-    URL_HASH SHA256=64c54781cfe9eefef2792003ab04b271d4b2ec32eda6e9cdf120d7aad4ebb282
+    URL https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz
 
     # No need to build anything; just copy over the Eigen directory.
     CONFIGURE_COMMAND ""
@@ -616,15 +610,13 @@ if(BUILD_OPENSSL AND MSVC)
 
   ExternalProject_Add(
     openssl
-    URL https://www.openssl.org/source/openssl-1.0.2u.tar.gz
-    URL_HASH SHA256=ecd0c6ffb493dd06707d38b14bb4d8c2288bb7033735606569d8f90f89669d16
+    URL https://www.openssl.org/source/openssl-3.0.0.tar.gz
 
     CONFIGURE_COMMAND perl Configure ${ssl_config} no-asm no-shared --prefix=<INSTALL_DIR>
-              COMMAND ${CMAKE_CURRENT_LIST_DIR}/openssl-ms.bat ${ssl_config}
-    BUILD_COMMAND nmake -f ms\\nt.mak
+    BUILD_COMMAND nmake
     BUILD_IN_SOURCE 1
 
-    INSTALL_COMMAND nmake -f ms\\nt.mak install
+    INSTALL_COMMAND nmake install
     INSTALL_DIR ${THIRDPARTY_DIR}/openssl
   )
 
@@ -636,8 +628,7 @@ if(BUILD_OPENSSL AND MSVC)
 elseif(BUILD_OPENSSL AND NOT APPLE)
   ExternalProject_Add(
     openssl
-    URL https://www.openssl.org/source/openssl-1.0.2u.tar.gz
-    URL_HASH SHA256=ecd0c6ffb493dd06707d38b14bb4d8c2288bb7033735606569d8f90f89669d16
+    URL https://www.openssl.org/source/openssl-3.0.0.tar.gz
 
     CONFIGURE_COMMAND ./config no-asm no-shared --prefix=<INSTALL_DIR> ${CMAKE_C_FLAGS}
     BUILD_COMMAND ${MAKE}
@@ -675,8 +666,6 @@ elseif(BUILD_OPENSSL AND APPLE)
     URL https://www.openssl.org/source/openssl-1.0.2u.tar.gz
     URL_HASH SHA256=ecd0c6ffb493dd06707d38b14bb4d8c2288bb7033735606569d8f90f89669d16
 
-    PATCH_COMMAND patch -p1 < ${CMAKE_CURRENT_LIST_DIR}/patches/openssl-1.0.2u-darwin-arm64.patch
-
     CONFIGURE_COMMAND /usr/bin/perl ./Configure ${ssl_target} --prefix=<INSTALL_DIR> --openssldir=<INSTALL_DIR> ${ssl_flags}
     BUILD_COMMAND ${MAKE}
     BUILD_IN_SOURCE 1
@@ -697,9 +686,9 @@ if(BUILD_OPENEXR)
     openexr
     DEPENDS zlib
     GIT_REPOSITORY https://github.com/openexr/openexr.git
-    GIT_TAG dcaf5fdb4d1244d8e60a58832cfe9c54734a2257 #v2.2.1
-    URL https://github.com/openexr/openexr/archive/v2.2.1.tar.gz
-    URL_HASH SHA256=63ebc7677d63ad59f1ec205d149dff1da31e7e3c8e78e944458b1d371c7e2f3c
+    GIT_TAG master
+    #URL https://github.com/openexr/openexr/archive/v2.2.1.tar.gz
+    #URL_HASH SHA256=63ebc7677d63ad59f1ec205d149dff1da31e7e3c8e78e944458b1d371c7e2f3c
 
     PATCH_COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_LIST_DIR}/openexr.cmake <SOURCE_DIR>/CMakeLists.txt
 
@@ -731,8 +720,7 @@ if(BUILD_FFMPEG AND NOT WIN32)
   EXTERNALPROJECT_ADD(
     ffmpeg
     DEPENDS ogg vorbis freetype zlib
-    URL https://ffmpeg.org/releases/ffmpeg-3.2.4.tar.gz
-    URL_HASH SHA256=2838c37bd35dba6e9b08ebe4e6c11dedbe2d9909583e3c2b9e7a1ad3ce2a9607
+    URL https://ffmpeg.org/releases/ffmpeg-4.4.1.tar.gz
 
     CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --datadir=${CMAKE_BINARY_DIR}/etc --disable-shared --enable-static --enable-pic --disable-doc --disable-debug --disable-programs --disable-outdevs --enable-runtime-cpudetect
         "--cc=${CMAKE_C_COMPILER}"
@@ -760,7 +748,7 @@ if(BUILD_GLSLANG)
   ExternalProject_Add(
     glslang
     GIT_REPOSITORY https://github.com/KhronosGroup/glslang.git
-    GIT_TAG 6dc24ffa47174662a2599cc033069a10b77b46b8
+    GIT_TAG master
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DBUILD_EXTERNAL=OFF
@@ -779,7 +767,7 @@ if(BUILD_SPIRV_CROSS)
   ExternalProject_Add(
     spirv-cross
     GIT_REPOSITORY https://github.com/KhronosGroup/SPIRV-Cross.git
-    GIT_TAG d2e1e7ba989135618f82bfeb6d97695d0d9bb9f5
+    GIT_TAG master
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DSPIRV_CROSS_CLI=OFF
@@ -808,7 +796,7 @@ if(BUILD_SPIRV_TOOLS)
   ExternalProject_Add(
     spirv-headers
     GIT_REPOSITORY https://github.com/KhronosGroup/SPIRV-Headers.git
-    GIT_TAG 75b30a659c8a4979104986652c54cc421fc51129
+    GIT_TAG master
 
     BUILD_COMMAND cmake -E echo "Skipping build step."
     INSTALL_COMMAND cmake -E echo "Skipping install step."
@@ -819,7 +807,7 @@ if(BUILD_SPIRV_TOOLS)
     spirv-tools
     DEPENDS spirv-headers
     GIT_REPOSITORY https://github.com/KhronosGroup/SPIRV-Tools.git
-    GIT_TAG c79edd260c2b503f0eca57310057b4a100999cc5
+    GIT_TAG master
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DSPIRV-Headers_SOURCE_DIR=${CMAKE_CURRENT_BINARY_DIR}/spirv-headers-prefix/src/spirv-headers
