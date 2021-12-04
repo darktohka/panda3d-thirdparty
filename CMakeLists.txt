@@ -292,7 +292,7 @@ if(BUILD_BULLET)
   ExternalProject_Add(
     bullet
     GIT_REPOSITORY https://github.com/bulletphysics/bullet3.git
-    GIT_TAG 830f0a9565b1829a07e21e2f16be2aa9966bd28c #v2.89
+    GIT_TAG master
     #URL https://github.com/bulletphysics/bullet3/archive/2.83.7.tar.gz
     #URL_HASH SHA256=919087c764d0e93555c6ef0830c8951a9caafea99f52ac8b366e96adbe0112ed
 
@@ -514,7 +514,7 @@ if(BUILD_FCOLLADA)
   ExternalProject_Add(
     fcollada
     GIT_REPOSITORY https://github.com/rdb/fcollada.git
-    GIT_TAG b322c8fa82aa13f9424ffc82b493cb442ce6925e
+    GIT_TAG master
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DBUILD_UNICODE=OFF
@@ -528,7 +528,7 @@ if(BUILD_VRPN)
     vrpn
     # Pull from git since 7.33 has some compile issues
     GIT_REPOSITORY https://github.com/vrpn/vrpn.git
-    GIT_TAG 9cfc1a536f39e8815066c39a1cef0f8a515a2860
+    GIT_TAG master
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DQUATLIB_BUILD_EXAMPLES=OFF
@@ -679,11 +679,11 @@ if(BUILD_OPENEXR)
   ExternalProject_Add(
     openexr
     DEPENDS zlib
-    GIT_REPOSITORY https://github.com/openexr/openexr.git
-    GIT_TAG master
-    #URL https://github.com/openexr/openexr/archive/v2.2.1.tar.gz
+    #GIT_REPOSITORY https://github.com/openexr/openexr.git
+    #GIT_TAG master
+    URL https://github.com/AcademySoftwareFoundation/openexr/archive/refs/heads/master.zip
     #URL_HASH SHA256=63ebc7677d63ad59f1ec205d149dff1da31e7e3c8e78e944458b1d371c7e2f3c
-=
+
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DCMAKE_PREFIX_PATH=${THIRDPARTY_DIR}/zlib
       -DNAMESPACE_VERSIONING=OFF
