@@ -120,6 +120,86 @@ if(APPLE)
   )
 endif(APPLE)
 
+if(BUILD_OPENSSL AND MSVC)
+  if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(ssl_config VC-WIN64A)
+  else()
+    set(ssl_config VC-WIN32)
+  endif()
+
+  ExternalProject_Add(
+    openssl
+    URL https://www.openssl.org/source/openssl-3.0.0.tar.gz
+
+    CONFIGURE_COMMAND C:/Strawberry/perl/bin/perl Configure ${ssl_config} no-asm no-shared --prefix=<INSTALL_DIR>
+    BUILD_COMMAND nmake
+    BUILD_IN_SOURCE 1
+
+    INSTALL_COMMAND nmake install
+    INSTALL_DIR ${THIRDPARTY_DIR}/openssl
+  )
+
+  ExternalProject_Add_Step(openssl remove_extras
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/bin"
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/ssl"
+    DEPENDEES install
+  )
+elseif(BUILD_OPENSSL AND NOT APPLE)
+  ExternalProject_Add(
+    openssl
+    URL https://www.openssl.org/source/openssl-3.0.0.tar.gz
+
+    CONFIGURE_COMMAND ./config no-asm no-shared --prefix=<INSTALL_DIR> ${CMAKE_C_FLAGS}
+    BUILD_COMMAND ${MAKE}
+    BUILD_IN_SOURCE 1
+
+    INSTALL_DIR ${THIRDPARTY_DIR}/openssl
+  )
+
+  ExternalProject_Add_Step(openssl remove_extras
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/bin"
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/ssl"
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/lib/pkgconfig"
+    DEPENDEES install
+  )
+elseif(BUILD_OPENSSL AND APPLE)
+  set(ssl_flags ${CMAKE_C_FLAGS}
+                no-asm no-shared no-dso
+                -mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}
+                -Wno-nullability-completeness -Wno-expansion-to-defined)
+
+  if(CMAKE_OSX_SYSROOT)
+    set(ssl_flags ${ssl_flags} -isysroot${CMAKE_OSX_SYSROOT} -I/usr/include -Wl,-syslibroot,${CMAKE_OSX_SYSROOT})
+  endif()
+
+  if(CMAKE_OSX_ARCHITECTURES STREQUAL "arm64")
+    set(ssl_target "darwin64-arm64-cc")
+  elseif(CMAKE_OSX_ARCHITECTURES STREQUAL "i386")
+    set(ssl_target "darwin-i386-cc")
+  else()
+    set(ssl_target "darwin64-x86_64-cc")
+  endif()
+
+  ExternalProject_Add(
+    openssl
+    URL https://www.openssl.org/source/openssl-1.0.2u.tar.gz
+    URL_HASH SHA256=ecd0c6ffb493dd06707d38b14bb4d8c2288bb7033735606569d8f90f89669d16
+
+    CONFIGURE_COMMAND /usr/bin/perl ./Configure ${ssl_target} --prefix=<INSTALL_DIR> --openssldir=<INSTALL_DIR> ${ssl_flags}
+    BUILD_COMMAND ${MAKE}
+    BUILD_IN_SOURCE 1
+
+    INSTALL_DIR ${THIRDPARTY_DIR}/openssl
+  )
+
+  ExternalProject_Add_Step(openssl remove_extras
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/bin"
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/ssl"
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/lib/pkgconfig"
+    DEPENDEES install
+  )
+endif()
+
 if(BUILD_ZLIB)
   ExternalProject_Add(
     zlib
@@ -593,86 +673,6 @@ elseif(BUILD_NVIDIACG AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
       INSTALL_DIR ${THIRDPARTY_DIR}/nvidiacg
     )
   endif()
-endif()
-
-if(BUILD_OPENSSL AND MSVC)
-  if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(ssl_config VC-WIN64A)
-  else()
-    set(ssl_config VC-WIN32)
-  endif()
-
-  ExternalProject_Add(
-    openssl
-    URL https://www.openssl.org/source/openssl-3.0.0.tar.gz
-
-    CONFIGURE_COMMAND perl Configure ${ssl_config} no-asm no-shared --prefix=<INSTALL_DIR>
-    BUILD_COMMAND nmake
-    BUILD_IN_SOURCE 1
-
-    INSTALL_COMMAND nmake install
-    INSTALL_DIR ${THIRDPARTY_DIR}/openssl
-  )
-
-  ExternalProject_Add_Step(openssl remove_extras
-    COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/bin"
-    COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/ssl"
-    DEPENDEES install
-  )
-elseif(BUILD_OPENSSL AND NOT APPLE)
-  ExternalProject_Add(
-    openssl
-    URL https://www.openssl.org/source/openssl-3.0.0.tar.gz
-
-    CONFIGURE_COMMAND ./config no-asm no-shared --prefix=<INSTALL_DIR> ${CMAKE_C_FLAGS}
-    BUILD_COMMAND ${MAKE}
-    BUILD_IN_SOURCE 1
-
-    INSTALL_DIR ${THIRDPARTY_DIR}/openssl
-  )
-
-  ExternalProject_Add_Step(openssl remove_extras
-    COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/bin"
-    COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/ssl"
-    COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/lib/pkgconfig"
-    DEPENDEES install
-  )
-elseif(BUILD_OPENSSL AND APPLE)
-  set(ssl_flags ${CMAKE_C_FLAGS}
-                no-asm no-shared no-dso
-                -mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}
-                -Wno-nullability-completeness -Wno-expansion-to-defined)
-
-  if(CMAKE_OSX_SYSROOT)
-    set(ssl_flags ${ssl_flags} -isysroot${CMAKE_OSX_SYSROOT} -I/usr/include -Wl,-syslibroot,${CMAKE_OSX_SYSROOT})
-  endif()
-
-  if(CMAKE_OSX_ARCHITECTURES STREQUAL "arm64")
-    set(ssl_target "darwin64-arm64-cc")
-  elseif(CMAKE_OSX_ARCHITECTURES STREQUAL "i386")
-    set(ssl_target "darwin-i386-cc")
-  else()
-    set(ssl_target "darwin64-x86_64-cc")
-  endif()
-
-  ExternalProject_Add(
-    openssl
-    URL https://www.openssl.org/source/openssl-1.0.2u.tar.gz
-    URL_HASH SHA256=ecd0c6ffb493dd06707d38b14bb4d8c2288bb7033735606569d8f90f89669d16
-
-    CONFIGURE_COMMAND /usr/bin/perl ./Configure ${ssl_target} --prefix=<INSTALL_DIR> --openssldir=<INSTALL_DIR> ${ssl_flags}
-    BUILD_COMMAND ${MAKE}
-    BUILD_IN_SOURCE 1
-
-    INSTALL_DIR ${THIRDPARTY_DIR}/openssl
-  )
-
-  ExternalProject_Add_Step(openssl remove_extras
-    COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/bin"
-    COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/ssl"
-    COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/lib/pkgconfig"
-    DEPENDEES install
-  )
 endif()
 
 if(BUILD_OPENEXR)
