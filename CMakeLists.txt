@@ -683,9 +683,7 @@ if(BUILD_OPENEXR)
     GIT_TAG master
     #URL https://github.com/openexr/openexr/archive/v2.2.1.tar.gz
     #URL_HASH SHA256=63ebc7677d63ad59f1ec205d149dff1da31e7e3c8e78e944458b1d371c7e2f3c
-
-    PATCH_COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_LIST_DIR}/openexr.cmake <SOURCE_DIR>/CMakeLists.txt
-
+=
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DCMAKE_PREFIX_PATH=${THIRDPARTY_DIR}/zlib
       -DNAMESPACE_VERSIONING=OFF
