@@ -129,7 +129,7 @@ if(BUILD_OPENSSL AND MSVC)
 
   ExternalProject_Add(
     openssl
-    URL https://www.openssl.org/source/openssl-3.0.0.tar.gz
+    URL https://www.openssl.org/source/openssl-3.0.1.tar.gz
 
     CONFIGURE_COMMAND C:/Strawberry/perl/bin/perl Configure ${ssl_config} no-asm no-shared --prefix=<INSTALL_DIR>
     BUILD_COMMAND nmake
@@ -147,7 +147,7 @@ if(BUILD_OPENSSL AND MSVC)
 elseif(BUILD_OPENSSL AND NOT APPLE)
   ExternalProject_Add(
     openssl
-    URL https://www.openssl.org/source/openssl-3.0.0.tar.gz
+    URL https://www.openssl.org/source/openssl-3.0.1.tar.gz
 
     CONFIGURE_COMMAND ./config no-asm no-shared --prefix=<INSTALL_DIR> ${CMAKE_C_FLAGS}
     BUILD_COMMAND ${MAKE}
@@ -182,8 +182,7 @@ elseif(BUILD_OPENSSL AND APPLE)
 
   ExternalProject_Add(
     openssl
-    URL https://www.openssl.org/source/openssl-1.0.2u.tar.gz
-    URL_HASH SHA256=ecd0c6ffb493dd06707d38b14bb4d8c2288bb7033735606569d8f90f89669d16
+    URL https://www.openssl.org/source/openssl-3.0.1.tar.gz
 
     CONFIGURE_COMMAND /usr/bin/perl ./Configure ${ssl_target} --prefix=<INSTALL_DIR> --openssldir=<INSTALL_DIR> ${ssl_flags}
     BUILD_COMMAND ${MAKE}
@@ -205,8 +204,6 @@ if(BUILD_ZLIB)
     zlib
     GIT_REPOSITORY https://github.com/madler/zlib.git
     GIT_TAG master
-    #URL https://github.com/madler/zlib/archive/v1.2.11.tar.gz
-    #URL_HASH SHA256=629380c90a77b964d896ed37163f5c3a34f6e6d897311f1df2a7016355c45eff
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DZLIB_TESTS=OFF
@@ -246,8 +243,6 @@ if(BUILD_PNG)
     # Please note that libpng 1.6.32+ requires CMake 3.0.2
     GIT_REPOSITORY https://github.com/glennrp/libpng.git
     GIT_TAG libpng16
-    #URL https://github.com/glennrp/libpng/archive/v1.6.31.tar.gz
-    #URL_HASH SHA256=79c0391804c83a6e0b722c20be7c3a27aeb2fe09afbc3028abad243444c98aa0
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DCMAKE_PREFIX_PATH=${THIRDPARTY_DIR}/zlib
@@ -270,7 +265,7 @@ if(BUILD_ASSIMP)
     assimp
     DEPENDS zlib
     GIT_REPOSITORY https://github.com/assimp/assimp.git
-    GIT_TAG 837a0742c4c7b4ce470516d9b7586570afe741ea
+    GIT_TAG master
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DCMAKE_PREFIX_PATH=${THIRDPARTY_DIR}/zlib
@@ -293,8 +288,6 @@ if(BUILD_BULLET)
     bullet
     GIT_REPOSITORY https://github.com/bulletphysics/bullet3.git
     GIT_TAG master
-    #URL https://github.com/bulletphysics/bullet3/archive/2.83.7.tar.gz
-    #URL_HASH SHA256=919087c764d0e93555c6ef0830c8951a9caafea99f52ac8b366e96adbe0112ed
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DINSTALL_LIBS=ON
@@ -323,7 +316,8 @@ if(BUILD_HARFBUZZ)
   ExternalProject_Add(
     freetype-nohb
     DEPENDS zlib
-    URL https://gitlab.freedesktop.org/freetype/freetype/-/archive/VER-2-11-0/freetype-VER-2-11-0.tar.gz
+    GIT_REPOSITORY https://gitlab.freedesktop.org/freetype/freetype.git
+    GIT_TAG master
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DCMAKE_PREFIX_PATH=${THIRDPARTY_DIR}/zlib
@@ -337,7 +331,8 @@ if(BUILD_HARFBUZZ)
   ExternalProject_Add(
     harfbuzz
     DEPENDS freetype-nohb
-    URL https://github.com/harfbuzz/harfbuzz/releases/download/3.1.2/harfbuzz-3.1.2.tar.xz
+    GIT_REPOSITORY https://github.com/harfbuzz/harfbuzz.git
+    GIT_TAG main
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/freetype-nohb
@@ -365,7 +360,8 @@ if(BUILD_FREETYPE)
   ExternalProject_Add(
     freetype
     DEPENDS zlib harfbuzz
-    URL https://gitlab.freedesktop.org/freetype/freetype/-/archive/VER-2-11-0/freetype-VER-2-11-0.tar.gz
+    GIT_REPOSITORY https://gitlab.freedesktop.org/freetype/freetype.git
+    GIT_TAG master
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DCMAKE_PREFIX_PATH=${THIRDPARTY_DIR}/zlib;${THIRDPARTY_DIR}/harfbuzz
