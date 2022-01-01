@@ -588,6 +588,8 @@ if(BUILD_ODE)
     GIT_TAG master
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
+      -DODE_WITH_TESTS=OFF
+      -DODE_WITH_DEMOS=OFF
     INSTALL_DIR ${THIRDPARTY_DIR}/ode
   )
 endif()
