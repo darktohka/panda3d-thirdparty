@@ -129,7 +129,8 @@ if(BUILD_OPENSSL AND MSVC)
 
   ExternalProject_Add(
     openssl
-    URL https://www.openssl.org/source/openssl-3.0.1.tar.gz
+    GIT_REPOSITORY https://github.com/openssl/openssl.git
+    GIT_TAG master
 
     CONFIGURE_COMMAND C:/Strawberry/perl/bin/perl Configure ${ssl_config} no-asm no-shared --prefix=<INSTALL_DIR>
     BUILD_COMMAND nmake
@@ -147,7 +148,8 @@ if(BUILD_OPENSSL AND MSVC)
 elseif(BUILD_OPENSSL AND NOT APPLE)
   ExternalProject_Add(
     openssl
-    URL https://www.openssl.org/source/openssl-3.0.1.tar.gz
+    GIT_REPOSITORY https://github.com/openssl/openssl.git
+    GIT_TAG master
 
     CONFIGURE_COMMAND ./config no-asm no-shared --prefix=<INSTALL_DIR> ${CMAKE_C_FLAGS}
     BUILD_COMMAND ${MAKE}
@@ -182,7 +184,8 @@ elseif(BUILD_OPENSSL AND APPLE)
 
   ExternalProject_Add(
     openssl
-    URL https://www.openssl.org/source/openssl-3.0.1.tar.gz
+    GIT_REPOSITORY https://github.com/openssl/openssl.git
+    GIT_TAG master
 
     CONFIGURE_COMMAND /usr/bin/perl ./Configure ${ssl_target} --prefix=<INSTALL_DIR> --openssldir=<INSTALL_DIR> ${ssl_flags}
     BUILD_COMMAND ${MAKE}
@@ -581,11 +584,8 @@ endif()
 if(BUILD_ODE)
   ExternalProject_Add(
     ode
-    URL https://bitbucket.org/odedevs/ode/downloads/ode-0.13.1.tar.gz
-    URL_HASH SHA256=35e55e05c6c6ebb813a546017285a7aceedb3e8e55c8ff102e80e26bd84c5658
-
-    PATCH_COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_LIST_DIR}/libode.cmake <SOURCE_DIR>/CMakeLists.txt
-          COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_LIST_DIR}/libode-config.h.cmake <SOURCE_DIR>/ode/src/config.h.cmake
+    GIT_REPOSITORY https://bitbucket.org/odedevs/ode.git
+    GIT_TAG master
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
     INSTALL_DIR ${THIRDPARTY_DIR}/ode
