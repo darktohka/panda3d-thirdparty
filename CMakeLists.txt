@@ -50,6 +50,7 @@ option(BUILD_GLSLANG "Build glslang" ${DEFAULT_ENABLE})
 option(BUILD_SPIRV_CROSS "Build spirv-cross" ${DEFAULT_ENABLE})
 option(BUILD_SPIRV_TOOLS "Build spirv-tools" ${DEFAULT_ENABLE})
 option(BUILD_OPENCV "Build OpenCV" OFF)
+option(BUILD_MIMALLOC "Build mimalloc" ${DEFAULT_ENABLE})
 
 
 if(CMAKE_GENERATOR MATCHES "^Visual Studio [0-9]+ ")
@@ -677,8 +678,6 @@ if(BUILD_OPENEXR)
   ExternalProject_Add(
     openexr
     DEPENDS zlib
-    #GIT_REPOSITORY https://github.com/openexr/openexr.git
-    #GIT_TAG master
     URL https://github.com/AcademySoftwareFoundation/openexr/archive/refs/heads/master.zip
     #URL_HASH SHA256=63ebc7677d63ad59f1ec205d149dff1da31e7e3c8e78e944458b1d371c7e2f3c
 
@@ -719,8 +718,8 @@ if(BUILD_FFMPEG AND NOT WIN32)
         "--ranlib=${CMAKE_C_COMPILER_RANLIB}"
         "--nm=${CMAKE_NM}"
         "--strip=${CMAKE_STRIP}"
-        "--extra-cflags=${CMAKE_C_FLAGS} ${ffmpeg_osx_flags}"
-        "--extra-cxxflags=${CMAKE_CXX_FLAGS} ${ffmpeg_osx_flags}"
+        "--extra-cflags=${CMAKE_C_FLAGS} ${ffmpeg_osx_flags} -Wno-attributes"
+        "--extra-cxxflags=${CMAKE_CXX_FLAGS} ${ffmpeg_osx_flags} -Wno-attributes"
         "--extra-ldflags=${ffmpeg_osx_flags}"
     BUILD_COMMAND ${MAKE}
     BUILD_IN_SOURCE 1
@@ -862,5 +861,21 @@ if(BUILD_OPENCV)
     COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/share"
     COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/lib/pkgconfig"
     DEPENDEES install
+  )
+endif()
+
+if(BUILD_MIMALLOC)
+  ExternalProject_Add(
+    mimalloc
+    GIT_REPOSITORY https://github.com/microsoft/mimalloc.git
+    GIT_TAG v2.0.3
+
+    CMAKE_ARGS ${COMMON_CMAKE_ARGS}
+      -DMI_BUILD_SHARED=OFF
+      -DMI_BUILD_OBJECT=OFF
+      -DMI_BUILD_TESTS=OFF
+      -DMI_BUILD_STATIC=ON
+      -DMI_INSTALL_TOPLEVEL=ON
+    INSTALL_DIR ${THIRDPARTY_DIR}/mimalloc
   )
 endif()
