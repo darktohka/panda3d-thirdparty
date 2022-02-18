@@ -1,7 +1,7 @@
 # Many of this is based on the scripts in the Polycode project.  Many thanks
 # to the respective authors for going through the work of figuring this out!
 
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 2.8.12)
 
 # Set defaults.  Must be before project().
 if(APPLE)
@@ -50,6 +50,7 @@ option(BUILD_GLSLANG "Build glslang" ${DEFAULT_ENABLE})
 option(BUILD_SPIRV_CROSS "Build spirv-cross" ${DEFAULT_ENABLE})
 option(BUILD_SPIRV_TOOLS "Build spirv-tools" ${DEFAULT_ENABLE})
 option(BUILD_OPENCV "Build OpenCV" OFF)
+option(BUILD_MIMALLOC "Build mimalloc" ${DEFAULT_ENABLE})
 
 
 if(CMAKE_GENERATOR MATCHES "^Visual Studio [0-9]+ ")
@@ -108,6 +109,7 @@ set(COMMON_CMAKE_ARGS
   -DBUILD_SHARED_LIBS=OFF
   -DSKIP_INSTALL_EXECUTABLES=ON
   -DSKIP_INSTALL_FILES=ON
+  -Wno-dev
 )
 
 if(APPLE)
@@ -261,6 +263,8 @@ if(BUILD_PNG)
     COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/lib/libpng"
     DEPENDEES install
   )
+elseif(BUILD_SQUISH)
+  add_custom_target(png)
 endif()
 
 if(BUILD_ASSIMP)
@@ -345,6 +349,7 @@ if(BUILD_HARFBUZZ)
       -DHB_BUILD_SUBSET=OFF
       -DHB_HAVE_INTROSPECTION=OFF
       -DHB_HAVE_CORETEXT=OFF # macOS 10.8+
+      -DFREETYPE_LIBRARY=${CMAKE_CURRENT_BINARY_DIR}/freetype-nohb/lib/${CMAKE_STATIC_LIBRARY_PREFIX}freetype${CMAKE_STATIC_LIBRARY_SUFFIX}
       -DFREETYPE_INCLUDE_DIR_freetype2=${CMAKE_CURRENT_BINARY_DIR}/freetype-nohb/include/freetype2
       -DFREETYPE_INCLUDE_DIR_ft2build=${CMAKE_CURRENT_BINARY_DIR}/freetype-nohb/include/freetype2
     INSTALL_DIR ${THIRDPARTY_DIR}/harfbuzz
@@ -372,6 +377,8 @@ if(BUILD_FREETYPE)
       -DWITH_BZip2=OFF
       -DWITH_PNG=OFF
       -DHARFBUZZ_INCLUDE_DIRS=${THIRDPARTY_DIR}/harfbuzz/include
+      -DHARFBUZZ_LIBRARIES=${THIRDPARTY_DIR}/harfbuzz/lib/${CMAKE_STATIC_LIBRARY_PREFIX}harfbuzz${CMAKE_STATIC_LIBRARY_SUFFIX}
+      -DHARFBUZZ_ICU_LIBRARIES=${THIRDPARTY_DIR}/harfbuzz/lib/${CMAKE_STATIC_LIBRARY_PREFIX}harfbuzz${CMAKE_STATIC_LIBRARY_SUFFIX}
       -DPC_HARFBUZZ_INCLUDEDIR=${THIRDPARTY_DIR}/harfbuzz/include
       -DPC_HARFBUZZ_LIBDIR=${THIRDPARTY_DIR}/harfbuzz/lib
     INSTALL_DIR ${THIRDPARTY_DIR}/freetype
@@ -396,6 +403,8 @@ if(BUILD_VORBIS)
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DOGG_ROOT=${THIRDPARTY_DIR}/vorbis
+      -DOGG_INCLUDE_DIRS=${THIRDPARTY_DIR}/vorbis/include
+      -DOGG_LIBRARIES=${THIRDPARTY_DIR}/vorbis/lib/${CMAKE_STATIC_LIBRARY_PREFIX}ogg${CMAKE_STATIC_LIBRARY_SUFFIX}
     INSTALL_DIR ${THIRDPARTY_DIR}/vorbis
   )
 
@@ -430,11 +439,13 @@ if(BUILD_OPUS)
     GIT_REPOSITORY https://github.com/xiph/opusfile.git
     GIT_TAG master
 
-    PATCH_COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_LIST_DIR}/libopusfile.cmake <SOURCE_DIR>/CMakeLists.txt
-
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DOGG_ROOT=${THIRDPARTY_DIR}/opus
+      -DOGG_INCLUDE_DIRS=${THIRDPARTY_DIR}/opus/include
+      -DOGG_LIBRARIES=${THIRDPARTY_DIR}/opus/lib/${CMAKE_STATIC_LIBRARY_PREFIX}ogg${CMAKE_STATIC_LIBRARY_SUFFIX}
       -DOPUS_ROOT=${THIRDPARTY_DIR}/opus
+      -DOPUS_INCLUDE_DIRS=${THIRDPARTY_DIR}/opus/include/opus
+      -DOPUS_LIBRARIES=${THIRDPARTY_DIR}/opus/lib/${CMAKE_STATIC_LIBRARY_PREFIX}opus${CMAKE_STATIC_LIBRARY_SUFFIX}
     INSTALL_DIR ${THIRDPARTY_DIR}/opus
   )
 
@@ -473,7 +484,7 @@ endif()
 if(BUILD_JPEG)
   ExternalProject_Add(
     jpeg
-    URL http://www.ijg.org/files/jpegsrc.v9d.tar.gz
+    URL https://www.ijg.org/files/jpegsrc.v9e.tar.gz
 
     PATCH_COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_LIST_DIR}/libjpeg.cmake <SOURCE_DIR>/CMakeLists.txt
           COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_LIST_DIR}/libjpeg-jconfig.h.cmake <SOURCE_DIR>/jconfig.h.cmake
@@ -502,6 +513,7 @@ if(BUILD_SQUISH)
     URL_HASH SHA256=aec3428badafdbb3b0ed1ea3a385a8029e65694282459f61b4a538963e8cada3
 
     PATCH_COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_LIST_DIR}/libsquish.cmake <SOURCE_DIR>/CMakeLists.txt
+          COMMAND patch -p1 < ${CMAKE_CURRENT_LIST_DIR}/patches/squish-1.10-sse.diff
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DCMAKE_PREFIX_PATH=${THIRDPARTY_DIR}/png
@@ -569,7 +581,7 @@ endif()
 if(BUILD_EIGEN)
   ExternalProject_Add(
     eigen
-    URL https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz
+    URL https://gitlab.com/libeigen/eigen/-/archive/master/eigen-master.zip
 
     # No need to build anything; just copy over the Eigen directory.
     CONFIGURE_COMMAND ""
@@ -677,23 +689,17 @@ if(BUILD_OPENEXR)
   ExternalProject_Add(
     openexr
     DEPENDS zlib
-    #GIT_REPOSITORY https://github.com/openexr/openexr.git
-    #GIT_TAG master
     URL https://github.com/AcademySoftwareFoundation/openexr/archive/refs/heads/master.zip
-    #URL_HASH SHA256=63ebc7677d63ad59f1ec205d149dff1da31e7e3c8e78e944458b1d371c7e2f3c
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DCMAKE_PREFIX_PATH=${THIRDPARTY_DIR}/zlib
-      -DNAMESPACE_VERSIONING=OFF
+      -DBUILD_TESTING=OFF
+      -DOPENEXR_BUILD_TOOLS=OFF
+      -DOPENEXR_INSTALL_TOOLS=OFF
+      -DOPENEXR_INSTALL_EXAMPLES=OFF
+      -DOPENEXR_INSTALL_PKG_CONFIG=OFF
+      -DIMATH_INSTALL_PKG_CONFIG=OFF
     INSTALL_DIR ${THIRDPARTY_DIR}/openexr
-  )
-
-  # Remove the extra bin and share directories it created.
-  ExternalProject_Add_Step(openexr remove_extras
-    COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/bin"
-    COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/share"
-    COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/lib/pkgconfig"
-    DEPENDEES install
   )
 endif()
 
@@ -707,10 +713,10 @@ if(BUILD_FFMPEG AND NOT WIN32)
     endforeach()
   endif()
 
-  EXTERNALPROJECT_ADD(
+  EXTERNALPROJECT_ADD(ffmpeg
     ffmpeg
     DEPENDS ogg vorbis freetype zlib
-    URL https://ffmpeg.org/releases/ffmpeg-4.4.1.tar.gz
+    URL https://ffmpeg.org/releases/ffmpeg-5.0.tar.gz
 
     CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --datadir=${CMAKE_BINARY_DIR}/etc --disable-shared --enable-static --enable-pic --disable-doc --disable-debug --disable-programs --disable-outdevs --enable-runtime-cpudetect
         "--cc=${CMAKE_C_COMPILER}"
@@ -719,8 +725,8 @@ if(BUILD_FFMPEG AND NOT WIN32)
         "--ranlib=${CMAKE_C_COMPILER_RANLIB}"
         "--nm=${CMAKE_NM}"
         "--strip=${CMAKE_STRIP}"
-        "--extra-cflags=${CMAKE_C_FLAGS} ${ffmpeg_osx_flags}"
-        "--extra-cxxflags=${CMAKE_CXX_FLAGS} ${ffmpeg_osx_flags}"
+        "--extra-cflags=${CMAKE_C_FLAGS} ${ffmpeg_osx_flags} -Wno-attributes"
+        "--extra-cxxflags=${CMAKE_CXX_FLAGS} ${ffmpeg_osx_flags} -Wno-attributes"
         "--extra-ldflags=${ffmpeg_osx_flags}"
     BUILD_COMMAND ${MAKE}
     BUILD_IN_SOURCE 1
@@ -820,18 +826,13 @@ endif()
 if(BUILD_OPENCV)
   ExternalProject_Add(
     opencv
-    GIT_REPOSITORY https://github.com/opencv/opencv.git
-    GIT_TAG 6484732509400ff1cfed4ba44b4c8a1a11799e40 # 2.4.3
-
-    PATCH_COMMAND patch -p1 < ${CMAKE_CURRENT_LIST_DIR}/patches/opencv-2.4.3-highgui-avfoundation.patch
+    URL https://codeload.github.com/opencv/opencv/zip/refs/heads/4.x
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DBUILD_SHARED_LIBS=ON
-      -DWITH_CARBON=OFF
-      -DWITH_COCOA=ON
       -DBUILD_ZLIB=OFF
-      -DPYTHON_USE_NUMPY=OFF
       -DBUILD_DOCS=OFF
+      -DBUILD_EXAMPLES=OFF
       -DBUILD_TESTS=OFF
       -DBUILD_PERF_TESTS=OFF
       -DWITH_CUDA=OFF
@@ -862,5 +863,22 @@ if(BUILD_OPENCV)
     COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/share"
     COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/lib/pkgconfig"
     DEPENDEES install
+  )
+endif()
+
+if(BUILD_MIMALLOC)
+  ExternalProject_Add(
+    mimalloc
+    GIT_REPOSITORY https://github.com/microsoft/mimalloc.git
+    GIT_TAG master
+
+    CMAKE_ARGS ${COMMON_CMAKE_ARGS}
+      -DMI_BUILD_SHARED=OFF
+      -DMI_BUILD_OBJECT=OFF
+      -DMI_BUILD_TESTS=OFF
+      -DMI_BUILD_STATIC=ON
+      -DMI_INSTALL_TOPLEVEL=ON
+      -DMI_OVERRIDE=OFF
+    INSTALL_DIR ${THIRDPARTY_DIR}/mimalloc
   )
 endif()
