@@ -719,7 +719,7 @@ if(BUILD_FFMPEG AND NOT WIN32)
   EXTERNALPROJECT_ADD(ffmpeg
     ffmpeg
     DEPENDS ogg vorbis freetype zlib
-    URL https://ffmpeg.org/releases/ffmpeg-5.0.tar.gz
+    URL https://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2
 
     CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --datadir=${CMAKE_BINARY_DIR}/etc --disable-shared --enable-static --enable-pic --disable-doc --disable-debug --disable-programs --disable-outdevs --enable-runtime-cpudetect
         "--cc=${CMAKE_C_COMPILER}"
