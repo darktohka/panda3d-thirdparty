@@ -207,11 +207,12 @@ endif()
 if(BUILD_ZLIB)
   ExternalProject_Add(
     zlib
-    GIT_REPOSITORY https://github.com/madler/zlib.git
-    GIT_TAG master
+    GIT_REPOSITORY https://github.com/zlib-ng/zlib-ng.git
+    GIT_TAG develop
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
-      -DZLIB_TESTS=OFF
+      -DZLIB_COMPAT=ON
+      -DZLIB_ENABLE_TESTS=OFF
     INSTALL_DIR ${THIRDPARTY_DIR}/zlib
   )
 
