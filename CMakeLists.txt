@@ -134,11 +134,11 @@ if(BUILD_OPENSSL AND MSVC)
     GIT_REPOSITORY https://github.com/openssl/openssl.git
     GIT_TAG master
 
-    CONFIGURE_COMMAND C:/Strawberry/perl/bin/perl Configure ${ssl_config} no-asm no-shared --prefix=<INSTALL_DIR>
+    CONFIGURE_COMMAND C:/Strawberry/perl/bin/perl Configure ${ssl_config} no-asm no-shared no-tests --prefix=<INSTALL_DIR>
     BUILD_COMMAND nmake
     BUILD_IN_SOURCE 1
 
-    INSTALL_COMMAND nmake install
+    INSTALL_COMMAND nmake install_sw
     INSTALL_DIR ${THIRDPARTY_DIR}/openssl
   )
 
@@ -153,7 +153,7 @@ elseif(BUILD_OPENSSL AND NOT APPLE)
     GIT_REPOSITORY https://github.com/openssl/openssl.git
     GIT_TAG master
 
-    CONFIGURE_COMMAND ./config no-asm no-shared --prefix=<INSTALL_DIR> ${CMAKE_C_FLAGS}
+    CONFIGURE_COMMAND ./config no-asm no-tests no-shared --prefix=<INSTALL_DIR> ${CMAKE_C_FLAGS}
     BUILD_COMMAND ${MAKE}
     BUILD_IN_SOURCE 1
 
@@ -168,7 +168,7 @@ elseif(BUILD_OPENSSL AND NOT APPLE)
   )
 elseif(BUILD_OPENSSL AND APPLE)
   set(ssl_flags ${CMAKE_C_FLAGS}
-                no-asm no-shared no-dso
+                no-asm no-shared no-tests no-dso
                 -mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}
                 -Wno-nullability-completeness -Wno-expansion-to-defined)
 
@@ -393,6 +393,7 @@ if(BUILD_VORBIS)
     GIT_TAG master
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
+      -DBUILD_TESTING=OFF
     INSTALL_DIR ${THIRDPARTY_DIR}/vorbis
   )
 
@@ -406,6 +407,7 @@ if(BUILD_VORBIS)
       -DOGG_ROOT=${THIRDPARTY_DIR}/vorbis
       -DOGG_INCLUDE_DIRS=${THIRDPARTY_DIR}/vorbis/include
       -DOGG_LIBRARIES=${THIRDPARTY_DIR}/vorbis/lib/${CMAKE_STATIC_LIBRARY_PREFIX}ogg${CMAKE_STATIC_LIBRARY_SUFFIX}
+      -DBUILD_TESTING=OFF
     INSTALL_DIR ${THIRDPARTY_DIR}/vorbis
   )
 
@@ -422,6 +424,7 @@ if(BUILD_OPUS)
     GIT_TAG master
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
+      -DBUILD_TESTING=OFF
     INSTALL_DIR ${THIRDPARTY_DIR}/opus
   )
 
@@ -431,6 +434,9 @@ if(BUILD_OPUS)
     GIT_TAG master
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
+      -DOPUS_BUILD_TESTING=OFF
+      -DOPUS_BUILD_PROGRAMS=OFF
+      -DBUILD_TESTING=OFF
     INSTALL_DIR ${THIRDPARTY_DIR}/opus
   )
 
