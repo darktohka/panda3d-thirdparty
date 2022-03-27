@@ -572,13 +572,14 @@ if(BUILD_TIFF)
   ExternalProject_Add(
     tiff
     DEPENDS zlib jpeg
-    URL http://download.osgeo.org/libtiff/tiff-4.3.0.tar.gz
+    URL https://gitlab.com/darktohka/libtiff/-/archive/master/libtiff-master.tar.bz2
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DCMAKE_PREFIX_PATH=${THIRDPARTY_DIR}/zlib;${THIRDPARTY_DIR}/jpeg
       -DJPEG_INCLUDE_DIR=${THIRDPARTY_DIR}/jpeg/include
       -DJPEG_LIBRARY=${JPEG_LIBRARY}
       -Dzlib=ON -Djpeg=ON -Dlzma=OFF -Dcxx=OFF
+      -Dtools=OFF -Dtests=OFF -Dcontrib=OFF -Dhtml-docs=OFF -Dman-docs=OFF
     INSTALL_DIR ${THIRDPARTY_DIR}/tiff
   )
 
