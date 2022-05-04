@@ -432,7 +432,7 @@ if(BUILD_OPUS)
 
   ExternalProject_Add(
     opus
-    GIT_REPOSITORY https://github.com/xnorpx/opus.git
+    GIT_REPOSITORY https://github.com/xiph/opus.git
     GIT_TAG master
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
