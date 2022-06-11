@@ -27,7 +27,7 @@ endif()
 
 option(BUILD_ZLIB "Build zlib" ${DEFAULT_ENABLE})
 option(BUILD_PNG "Build libpng (requires zlib)" ${DEFAULT_ENABLE})
-option(BUILD_ASSIMP "Build assimp (requires zlib)" ${NOT_APPLE})
+option(BUILD_ASSIMP "Build assimp (requires zlib)" OFF)
 option(BUILD_BULLET "Build bullet" ${DEFAULT_ENABLE})
 option(BUILD_HARFBUZZ "Build harfbuzz (requires freetype)" ${DEFAULT_ENABLE})
 option(BUILD_FREETYPE "Build freetype (requires harfbuzz, zlib and png)" ${DEFAULT_ENABLE})
