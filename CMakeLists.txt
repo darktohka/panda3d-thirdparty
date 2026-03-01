@@ -270,7 +270,7 @@ if(BUILD_JXL)
   ExternalProject_Add(
     highway
     GIT_REPOSITORY https://github.com/google/highway.git
-    GIT_TAG ac0d5d297b13ab1b89f48484fc7911082d76a93f # v1.3.0
+    GIT_TAG 5d0d33a720df46df78fceb9129f38cb2d8f996ea # contains bugfixes for Android builds
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DHWY_ENABLE_CONTRIB=OFF
