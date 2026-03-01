@@ -32,6 +32,7 @@ Some packages are still forthcoming.  The included packages are ticked.
 - [x] freetype
 - [x] harfbuzz
 - [x] jpeg
+- [x] jxl
 - [x] mimalloc
 - [x] nvidiacg (except arm64 or Android)
 - [x] ode

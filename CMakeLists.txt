@@ -56,6 +56,7 @@ endif()
 option(BUILD_OPENCV "Build OpenCV" OFF)
 option(BUILD_MIMALLOC "Build mimalloc" ${DEFAULT_ENABLE})
 option(BUILD_RECAST "Build Recast Navigation" OFF)
+option(BUILD_JXL "Build libjxl (requires highway, brotli, jpeg, png and lcms2)" ${DEFAULT_ENABLE})
 
 function(add_lipo_target)
   set(libs ${ARGV})
@@ -262,6 +263,72 @@ if(BUILD_PNG)
   )
 elseif(BUILD_SQUISH)
   add_custom_target(png)
+endif()
+
+
+if(BUILD_JXL)
+  ExternalProject_Add(
+    highway
+    GIT_REPOSITORY https://github.com/google/highway.git
+    GIT_TAG ac0d5d297b13ab1b89f48484fc7911082d76a93f # v1.3.0
+
+    CMAKE_ARGS ${COMMON_CMAKE_ARGS}
+      -DHWY_ENABLE_CONTRIB=OFF
+      -DHWY_ENABLE_EXAMPLES=OFF
+      -DHWY_ENABLE_TESTS=OFF
+      -DHWY_TEST_STANDALONE=OFF
+    INSTALL_DIR ${THIRDPARTY_DIR}/jxl
+  )
+
+  ExternalProject_Add(
+    brotli
+    GIT_REPOSITORY https://github.com/google/brotli.git
+    GIT_TAG 028fb5a23661f123017c060daa546b55cf4bde29 # v1.2.0
+
+    CMAKE_ARGS ${COMMON_CMAKE_ARGS}
+      -DBROTLI_BUILD_TOOLS=OFF
+      -DBROTLI_DISABLE_TESTS=ON
+    INSTALL_DIR ${THIRDPARTY_DIR}/jxl
+  )
+
+  ExternalProject_Add(
+    lcms2
+    GIT_REPOSITORY https://github.com/mm2/Little-CMS.git
+    GIT_TAG f6c146b72a3c9c8b25c86e02d7afaf9ce5a36f75 # no release with CMakeLists.txt yet
+
+    CMAKE_ARGS ${COMMON_CMAKE_ARGS}
+      -DLCMS2_BUILD_TOOLS=OFF
+      -DLCMS2_BUILD_TESTS=OFF
+      -DLCMS2_BUILD_SHARED=OFF
+      -DLCMS2_BUILD_STATIC=ON
+    INSTALL_DIR ${THIRDPARTY_DIR}/jxl
+  )
+
+  ExternalProject_Add(
+    jxl
+    DEPENDS highway brotli lcms2
+    GIT_REPOSITORY https://github.com/libjxl/libjxl.git
+    GIT_TAG 332feb17d17311c748445f7ee75c4fb55cc38530 # v0.11.2
+
+    CMAKE_ARGS ${COMMON_CMAKE_ARGS}
+      -DCMAKE_PREFIX_PATH=${THIRDPARTY_DIR}/jxl
+      -DJPEGXL_ENABLE_FUZZERS=OFF
+      -DJPEGXL_ENABLE_DEVTOOLS=OFF
+      -DJPEGXL_ENABLE_TOOLS=OFF
+      -DJPEGXL_ENABLE_DOXYGEN=OFF
+      -DJPEGXL_ENABLE_MANPAGES=OFF
+      -DJPEGXL_ENABLE_BENCHMARK=OFF
+      -DJPEGXL_ENABLE_EXAMPLES=OFF
+      -DJPEGXL_BUNDLE_LIBPNG=OFF
+      -DJPEGXL_ENABLE_JNI=OFF
+      -DJPEGXL_ENABLE_SJPEG=OFF
+      -DJPEGXL_ENABLE_OPENEXR=OFF
+      -DJPEGXL_ENABLE_VIEWERS=OFF
+      -DJPEGXL_ENABLE_TCMALLOC=OFF
+      -DJPEGXL_ENABLE_SKCMS=OFF
+      -DBUILD_TESTING=OFF
+    INSTALL_DIR ${THIRDPARTY_DIR}/jxl
+  )
 endif()
 
 if(BUILD_ASSIMP)
